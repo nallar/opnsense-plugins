@@ -349,7 +349,7 @@ class updatedns
     function _update()
     {
         if ($this->_dnsVerboseLog) {
-            log_error("Dynamic DNS ({$this->_dnsHost} via {$this->_dnsServiceList[$this->_dnsService]}): _update() starting.");
+            log_error("Dynamic DNS ({$this->_dnsHost} via {$this->_dnsServiceList[$this->_dnsService]}): _update() starting. $this->_dnsRequestIfIP");
         }
 
         if ($this->_dnsService != 'ods' and $this->_dnsService != 'route53' and $this->_dnsService != 'route53-v6') {
@@ -357,8 +357,16 @@ class updatedns
             curl_setopt($ch, CURLOPT_HEADER, 0);
             curl_setopt($ch, CURLOPT_USERAGENT, $this->_UserAgent);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_INTERFACE, $this->_dnsRequestIfIP);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            //curl_setopt($ch, CURLOPT_INTERFACE, "if!" . $this->_dnsRequestIf);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+			if ($this->_curlIpresolveV4) {
+				curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+			}
+			if ($this->_curlSslVerifypeer) {
+				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+			} else {
+				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+			}
         }
 
         switch ($this->_dnsService) {
@@ -695,14 +703,6 @@ class updatedns
             case 'custom':
             case 'custom-v6':
                 if ($this->_dnsUser != '') {
-                    if ($this->_curlIpresolveV4) {
-                        curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-                    }
-                    if ($this->_curlSslVerifypeer) {
-                        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-                    } else {
-                        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                    }
                     curl_setopt($ch, CURLOPT_USERPWD, "{$this->_dnsUser}:{$this->_dnsPass}");
                 }
                 $server = str_replace("%IP%", $this->_dnsIP, $this->_dnsUpdateURL);

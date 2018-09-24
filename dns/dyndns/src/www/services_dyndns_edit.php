@@ -309,7 +309,7 @@ include("head.inc");
                       <strong><?= gettext("Enable verbose logging") ?></strong>
                     </td>
                   </tr>
-                  <tr class="opt_field type_custom">
+                  <tr>
                     <td><i class="fa fa-info-circle text-muted"></i> <?=gettext("CURL options"); ?></td>
                     <td>
                       <input name="curl_ipresolve_v4" type="checkbox" id="curl_ipresolve_v4" value="yes" <?= empty($pconfig['curl_ipresolve_v4']) ? '' : 'checked="checked"' ?> />
